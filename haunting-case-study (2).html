@@ -1,0 +1,1978 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Haunting — UX Case Study</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;0,900;1,400;1,700&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0A0A0A;
+    --surface: #111111;
+    --surface-2: #161616;
+    --border: #1E1E1E;
+    --border-light: #2A2A2A;
+    --text-primary: #E8E8E4;
+    --text-secondary: #888880;
+    --text-muted: #444440;
+    --accent: #DA4222;
+    --accent-green: #59B247;
+    --accent-warm: #C8A87A;
+    --font-display: 'Playfair Display', Georgia, serif;
+    --font-body: 'DM Sans', sans-serif;
+    --font-mono: 'DM Mono', monospace;
+    --max-w: 1200px;
+    --gutter: 120px;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text-primary);
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.7;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar { width: 3px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 2px; }
+
+  /* ── NAVIGATION ── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    padding: 20px var(--gutter);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid transparent;
+    transition: all 0.4s ease;
+  }
+  nav.scrolled {
+    background: rgba(10,10,10,0.92);
+    backdrop-filter: blur(20px);
+    border-bottom-color: var(--border);
+  }
+  .nav-logo {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    color: var(--text-muted);
+    text-transform: uppercase;
+  }
+  .nav-links {
+    display: flex;
+    gap: 32px;
+    list-style: none;
+  }
+  .nav-links a {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--text-primary); }
+
+  /* ── LAYOUT HELPERS ── */
+  .container {
+    max-width: var(--max-w);
+    margin: 0 auto;
+    padding: 0 var(--gutter);
+  }
+  section { padding: 120px 0; }
+  section + section { border-top: 1px solid var(--border); }
+
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .eyebrow::before {
+    content: '';
+    display: block;
+    width: 24px;
+    height: 1px;
+    background: var(--text-muted);
+  }
+
+  h1, h2, h3, h4 { font-family: var(--font-display); }
+
+  /* ── HERO ── */
+  #hero {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    position: relative;
+    overflow: hidden;
+    padding: 0;
+    border: none;
+  }
+  .hero-left {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 120px var(--gutter) 120px calc(var(--gutter) + 40px);
+    position: relative;
+    z-index: 2;
+  }
+  .hero-eyebrow {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 32px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .hero-eyebrow span {
+    display: inline-block;
+    width: 32px;
+    height: 1px;
+    background: var(--accent);
+  }
+  .hero-title {
+    font-size: clamp(56px, 6vw, 88px);
+    font-weight: 900;
+    line-height: 0.95;
+    letter-spacing: -0.01em;
+    margin-bottom: 24px;
+    color: var(--text-primary);
+  }
+  .hero-title em {
+    font-style: italic;
+    color: var(--accent);
+  }
+  .hero-subtitle {
+    font-size: 18px;
+    color: var(--text-secondary);
+    font-weight: 300;
+    line-height: 1.6;
+    max-width: 480px;
+    margin-bottom: 48px;
+  }
+  .hero-meta {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    margin-bottom: 40px;
+    line-height: 2;
+  }
+  .hero-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .tag {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 6px 14px;
+    border: 1px solid var(--border-light);
+    border-radius: 2px;
+    color: var(--text-secondary);
+    transition: all 0.2s;
+  }
+  .tag:hover { border-color: var(--accent); color: var(--accent); }
+
+  .hero-right {
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-image-wrap {
+    position: absolute;
+    inset: 0;
+  }
+  .hero-image-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center top;
+    filter: saturate(0.8) brightness(0.7);
+  }
+  .hero-image-wrap::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to right, var(--bg) 0%, transparent 30%);
+    z-index: 1;
+  }
+  .hero-image-wrap::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, var(--bg) 0%, transparent 20%);
+    z-index: 1;
+  }
+  .hero-scroll {
+    position: absolute;
+    bottom: 48px;
+    left: calc(var(--gutter) + 40px);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    z-index: 3;
+  }
+  .hero-scroll::after {
+    content: '';
+    display: block;
+    width: 40px;
+    height: 1px;
+    background: var(--text-muted);
+    animation: scrollPulse 2s ease-in-out infinite;
+  }
+  @keyframes scrollPulse { 0%,100%{opacity:0.3} 50%{opacity:1} }
+
+  /* ── OVERVIEW ── */
+  .overview-grid {
+    display: grid;
+    grid-template-columns: 240px 1fr 280px;
+    gap: 80px;
+    align-items: start;
+  }
+  .role-card {
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+    position: sticky;
+    top: 100px;
+  }
+  .role-card-row {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border);
+  }
+  .role-card-row:last-child { border-bottom: none; }
+  .role-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+  }
+  .role-value {
+    font-size: 14px;
+    color: var(--text-primary);
+    font-weight: 500;
+    line-height: 1.5;
+  }
+  .overview-body h2 {
+    font-size: 38px;
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    margin-bottom: 32px;
+    color: var(--text-primary);
+  }
+  .overview-body p {
+    color: var(--text-secondary);
+    margin-bottom: 20px;
+    font-size: 16px;
+    line-height: 1.8;
+    max-width: 620px;
+  }
+  .overview-body p strong {
+    color: var(--text-primary);
+    font-weight: 500;
+  }
+  .scope-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    position: sticky;
+    top: 100px;
+  }
+  .scope-item {
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-family: var(--font-mono);
+    letter-spacing: 0.02em;
+  }
+  .scope-item::before {
+    content: '✦';
+    color: var(--accent-green);
+    font-size: 10px;
+    flex-shrink: 0;
+  }
+  .scope-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 16px;
+  }
+
+  /* ── PROBLEM ── */
+  .problem-headline {
+    font-size: clamp(36px, 4vw, 56px);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -0.01em;
+    max-width: 900px;
+    margin-bottom: 64px;
+    color: var(--text-primary);
+  }
+  .problem-headline em {
+    font-style: italic;
+    color: var(--text-secondary);
+  }
+  .problem-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: start;
+  }
+  .problem-body p {
+    color: var(--text-secondary);
+    line-height: 1.85;
+    margin-bottom: 24px;
+    font-size: 15px;
+  }
+  .problem-body p strong { color: var(--text-primary); font-weight: 500; }
+  .system-list {
+    margin-top: 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+  .system-item {
+    padding: 24px 0;
+    border-bottom: 1px solid var(--border);
+    display: grid;
+    grid-template-columns: 40px 1fr;
+    gap: 20px;
+    align-items: start;
+  }
+  .system-num {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 0.1em;
+    padding-top: 2px;
+  }
+  .system-name {
+    font-family: var(--font-display);
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: 0.05em;
+    margin-bottom: 6px;
+  }
+  .system-desc {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    font-family: var(--font-mono);
+  }
+  .diagram-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 48px;
+    position: relative;
+  }
+  .diagram-title {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 40px;
+    text-align: center;
+  }
+  .diagram-nodes {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: center;
+  }
+  .diag-node {
+    width: 100%;
+    max-width: 280px;
+    padding: 16px 24px;
+    border: 1px solid var(--border-light);
+    border-radius: 2px;
+    text-align: center;
+    position: relative;
+  }
+  .diag-node.center {
+    border-color: var(--accent);
+    background: rgba(218,66,34,0.06);
+  }
+  .diag-node-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+  }
+  .diag-node-name {
+    font-family: var(--font-display);
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+  .diag-node.green { border-color: var(--accent-green); background: rgba(89,178,71,0.06); }
+  .diag-node.red { border-color: var(--accent); background: rgba(218,66,34,0.06); }
+  .diag-arrow {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* ── GOALS ── */
+  .goals-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 64px;
+  }
+  .goal-card {
+    background: var(--surface);
+    padding: 48px 40px;
+    transition: background 0.3s;
+  }
+  .goal-card:hover { background: var(--surface-2); }
+  .goal-icon {
+    font-size: 24px;
+    margin-bottom: 20px;
+    display: block;
+  }
+  .goal-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 16px;
+  }
+  .goal-text {
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1.3;
+    color: var(--text-primary);
+    letter-spacing: -0.01em;
+  }
+  .metrics-title {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 24px;
+  }
+  .metrics-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+  .metric-item {
+    padding: 16px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    font-family: var(--font-mono);
+    line-height: 1.6;
+  }
+  .metric-item::before {
+    content: '→';
+    color: var(--accent-green);
+    flex-shrink: 0;
+  }
+
+  /* ── CONSTRAINTS ── */
+  .constraints-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .constraint-card {
+    background: var(--surface);
+    padding: 40px 32px;
+  }
+  .constraint-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .constraint-label::before {
+    content: '';
+    display: block;
+    width: 16px;
+    height: 1px;
+    background: var(--accent);
+  }
+  .constraint-text {
+    font-size: 14px;
+    color: var(--text-secondary);
+    line-height: 1.7;
+  }
+
+  /* ── RESEARCH ── */
+  .research-intro {
+    max-width: 680px;
+    margin-bottom: 64px;
+  }
+  .research-intro h2 {
+    font-size: 40px;
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    margin-bottom: 20px;
+  }
+  .research-intro p {
+    color: var(--text-secondary);
+    font-size: 15px;
+    line-height: 1.8;
+  }
+  .insights-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .insight-card {
+    background: var(--surface);
+    padding: 48px 40px;
+    position: relative;
+    transition: background 0.3s;
+  }
+  .insight-card:hover { background: var(--surface-2); }
+  .insight-num {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    color: var(--text-muted);
+    margin-bottom: 20px;
+  }
+  .insight-topic {
+    font-family: var(--font-display);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent-warm);
+    margin-bottom: 12px;
+  }
+  .insight-text {
+    font-size: 18px;
+    color: var(--text-primary);
+    font-weight: 500;
+    line-height: 1.5;
+    margin-bottom: 24px;
+    font-family: var(--font-display);
+    letter-spacing: -0.01em;
+  }
+  .insight-implication {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--accent-green);
+    line-height: 1.6;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+  }
+  .insight-implication strong {
+    color: var(--text-muted);
+    font-weight: 400;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    font-size: 10px;
+    display: block;
+    margin-bottom: 8px;
+  }
+
+  /* ── STRATEGY ── */
+  .strategy-layout {
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 80px;
+    align-items: center;
+  }
+  .strategy-headline {
+    font-size: clamp(32px, 3.5vw, 52px);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -0.01em;
+    margin-bottom: 32px;
+    color: var(--text-primary);
+  }
+  .strategy-body p {
+    font-size: 15px;
+    color: var(--text-secondary);
+    line-height: 1.85;
+    margin-bottom: 20px;
+    max-width: 560px;
+  }
+  .strategy-body p strong { color: var(--text-primary); font-weight: 500; }
+  .strategy-diagram {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 40px 32px;
+  }
+  .strat-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+  .strat-box {
+    padding: 12px 16px;
+    border: 1px solid var(--border-light);
+    border-radius: 2px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-secondary);
+    flex: 1;
+    text-align: center;
+    letter-spacing: 0.05em;
+  }
+  .strat-box.highlight-green { border-color: var(--accent-green); color: var(--accent-green); background: rgba(89,178,71,0.06); }
+  .strat-box.highlight-red { border-color: var(--accent); color: var(--accent); background: rgba(218,66,34,0.06); }
+  .strat-box.highlight-warm { border-color: var(--accent-warm); color: var(--accent-warm); background: rgba(200,168,122,0.06); }
+  .strat-arrow { color: var(--text-muted); font-size: 14px; flex-shrink: 0; }
+  .strat-connector {
+    margin: 4px 0 4px 48px;
+    height: 24px;
+    border-left: 1px solid var(--border-light);
+  }
+
+  /* ── FLOWS ── */
+  .flows-intro {
+    max-width: 600px;
+    margin-bottom: 64px;
+  }
+  .flows-intro h2 {
+    font-size: 40px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    line-height: 1.15;
+    margin-bottom: 16px;
+  }
+  .flows-intro p {
+    color: var(--text-secondary);
+    font-size: 15px;
+  }
+  .flow-block {
+    margin-bottom: 48px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .flow-header {
+    padding: 20px 32px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .flow-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .flow-dot.green { background: var(--accent-green); }
+  .flow-dot.red { background: var(--accent); }
+  .flow-name {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+  }
+  .flow-steps {
+    padding: 32px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0;
+    align-items: center;
+  }
+  .flow-step {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    flex-shrink: 0;
+  }
+  .step-box {
+    padding: 10px 16px;
+    border: 1px solid var(--border-light);
+    border-radius: 2px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    letter-spacing: 0.03em;
+    transition: border-color 0.2s, color 0.2s;
+  }
+  .step-box:hover { border-color: var(--text-secondary); color: var(--text-primary); }
+  .step-box.key {
+    border-color: var(--accent-green);
+    color: var(--accent-green);
+    background: rgba(89,178,71,0.06);
+  }
+  .step-box.key-red {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: rgba(218,66,34,0.06);
+  }
+  .step-arrow {
+    width: 28px;
+    height: 1px;
+    background: var(--border-light);
+    position: relative;
+    flex-shrink: 0;
+  }
+  .step-arrow::after {
+    content: '›';
+    position: absolute;
+    right: -6px;
+    top: -9px;
+    color: var(--border-light);
+    font-size: 14px;
+  }
+  .flow-rationale {
+    padding: 16px 32px 24px;
+    border-top: 1px solid var(--border);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+  .flow-rationale strong { color: var(--accent-green); font-weight: 400; }
+
+  /* ── SCREENS ── */
+  .screens-intro {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: end;
+    margin-bottom: 64px;
+  }
+  .screens-intro h2 {
+    font-size: 40px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    line-height: 1.15;
+  }
+  .screens-intro p {
+    color: var(--text-secondary);
+    font-size: 15px;
+    line-height: 1.8;
+  }
+  .screen-showcase {
+    margin-bottom: 64px;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .screen-chrome {
+    background: var(--surface);
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  .chrome-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .chrome-dot.r { background: #FF5F57; }
+  .chrome-dot.y { background: #FEBC2E; }
+  .chrome-dot.g { background: #28C840; }
+  .chrome-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    color: var(--text-muted);
+    margin-left: 8px;
+    text-transform: uppercase;
+  }
+  .screen-image {
+    width: 100%;
+    display: block;
+    height: auto;
+  }
+  .screen-annotation-strip {
+    padding: 32px 40px;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 40px;
+  }
+  .annotation {
+    position: relative;
+  }
+  .annotation-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent-green);
+    margin-bottom: 10px;
+  }
+  .annotation-text {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.65;
+  }
+
+  /* ── INTERACTION DESIGN ── */
+  .interaction-panels {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-top: 48px;
+  }
+  .i-panel {
+    background: var(--surface);
+    padding: 40px 32px;
+    transition: background 0.3s;
+  }
+  .i-panel:hover { background: var(--surface-2); }
+  .i-panel-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+  }
+  .i-panel-name {
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 24px;
+    letter-spacing: -0.01em;
+  }
+  .annotation-list { list-style: none; display: flex; flex-direction: column; gap: 0; }
+  .annotation-item {
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  .annotation-item:last-child { border-bottom: none; }
+  .annotation-item::before {
+    content: '↗';
+    color: var(--accent-green);
+    font-size: 12px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  /* ── UI SYSTEM ── */
+  .system-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 48px;
+  }
+  .system-card {
+    background: var(--surface);
+    padding: 32px;
+    transition: background 0.3s;
+  }
+  .system-card:hover { background: var(--surface-2); }
+  .sys-component-name {
+    font-family: var(--font-display);
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+    letter-spacing: -0.01em;
+  }
+  .sys-component-desc {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    line-height: 1.6;
+    letter-spacing: 0.03em;
+  }
+  .sys-tag {
+    display: inline-block;
+    margin-top: 12px;
+    padding: 3px 10px;
+    border: 1px solid var(--border-light);
+    border-radius: 2px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--text-muted);
+    letter-spacing: 0.1em;
+  }
+  .system-principles {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 40px;
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 48px;
+    align-items: start;
+  }
+  .principles-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    padding-top: 4px;
+  }
+  .principles-list { list-style: none; display: flex; flex-direction: column; gap: 0; }
+  .principle-item {
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+  }
+  .principle-item::before {
+    content: '→';
+    color: var(--accent-green);
+    flex-shrink: 0;
+  }
+  .principle-item:last-child { border-bottom: none; }
+
+  /* ── IMPACT ── */
+  .impact-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 64px;
+  }
+  .stat-card {
+    background: var(--surface);
+    padding: 40px 32px;
+    transition: background 0.3s;
+  }
+  .stat-card:hover { background: var(--surface-2); }
+  .stat-number {
+    font-family: var(--font-display);
+    font-size: 36px;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    color: var(--text-primary);
+    line-height: 1;
+    margin-bottom: 12px;
+  }
+  .stat-desc {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+  .impact-quote {
+    max-width: 800px;
+    margin: 0 auto;
+    text-align: center;
+  }
+  .impact-quote p {
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 500;
+    line-height: 1.6;
+    color: var(--text-secondary);
+    letter-spacing: -0.01em;
+  }
+  .impact-quote p strong { color: var(--text-primary); font-weight: 700; }
+
+  /* ── COLLABORATION ── */
+  .collab-intro { max-width: 600px; margin-bottom: 64px; }
+  .collab-intro h2 { font-size: 40px; font-weight: 700; letter-spacing: -0.01em; line-height: 1.15; margin-bottom: 16px; }
+  .collab-intro p { color: var(--text-secondary); font-size: 15px; line-height: 1.8; }
+  .timeline-track {
+    position: relative;
+    padding-top: 48px;
+  }
+  .timeline-spine {
+    position: absolute;
+    top: 60px;
+    left: 0; right: 0;
+    height: 1px;
+    background: var(--border);
+  }
+  .timeline-cols {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+  }
+  .timeline-col {
+    padding: 0 24px 0 0;
+    position: relative;
+  }
+  .timeline-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: 2px solid var(--accent);
+    background: var(--bg);
+    margin-bottom: 24px;
+    position: relative;
+    z-index: 1;
+  }
+  .timeline-week {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 12px;
+  }
+  .timeline-team {
+    font-family: var(--font-display);
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 12px;
+  }
+  .timeline-desc {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.7;
+  }
+  .collab-note {
+    margin-top: 64px;
+    padding: 32px 40px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 3px 3px 0;
+    font-size: 15px;
+    color: var(--text-secondary);
+    line-height: 1.8;
+    max-width: 720px;
+  }
+
+  /* ── REFLECTION ── */
+  .reflection-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .ref-col {
+    background: var(--surface);
+    padding: 48px 40px;
+  }
+  .ref-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 24px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+  }
+  .ref-item {
+    padding: 16px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+    color: var(--text-secondary);
+    line-height: 1.7;
+  }
+  .ref-item:last-child { border-bottom: none; }
+  .ref-item strong { color: var(--text-primary); font-weight: 500; display: block; margin-bottom: 6px; font-size: 14px; }
+
+  /* ── FOOTER ── */
+  footer {
+    padding: 80px var(--gutter);
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .footer-left {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    line-height: 1.8;
+  }
+  .footer-right {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    text-align: right;
+    line-height: 1.8;
+  }
+
+  /* ── FADE IN ANIMATION ── */
+  .fade-up {
+    opacity: 0;
+    transform: translateY(32px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .fade-up.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ── DIVIDER LINE ── */
+  .section-line {
+    width: 40px;
+    height: 1px;
+    background: var(--accent);
+    margin-bottom: 48px;
+  }
+
+  /* ── INLINE HIGHLIGHT ── */
+  .hl { color: var(--text-primary); font-weight: 500; }
+  .hl-accent { color: var(--accent); }
+  .hl-green { color: var(--accent-green); }
+
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="nav">
+  <div class="nav-logo">Rayz Vault — Portfolio</div>
+  <ul class="nav-links">
+    <li><a href="#overview">Overview</a></li>
+    <li><a href="#problem">Problem</a></li>
+    <li><a href="#process">Process</a></li>
+    <li><a href="#design">Design</a></li>
+    <li><a href="#impact">Impact</a></li>
+    <li><a href="#reflection">Reflection</a></li>
+  </ul>
+</nav>
+
+<!-- ① HERO -->
+<section id="hero">
+  <div class="hero-left">
+    <div class="hero-eyebrow"><span></span>UX Case Study — Live Service</div>
+    <h1 class="hero-title">The<br><em>Haunting</em></h1>
+    <p class="hero-subtitle">Designing a dual-loop progression event system for Call of Duty — serving tens of millions of active players across console and PC.</p>
+    <div class="hero-meta">
+      Infinity Ward / Activision &nbsp;&nbsp;·&nbsp;&nbsp; Lead UX Designer<br>
+      Season 6, 2023 &nbsp;&nbsp;·&nbsp;&nbsp; 8 Weeks to Ship
+    </div>
+    <div class="hero-tags">
+      <span class="tag">Interaction Design</span>
+      <span class="tag">Event Systems</span>
+      <span class="tag">Information Architecture</span>
+      <span class="tag">Live Service</span>
+      <span class="tag">Console + PC</span>
+      <span class="tag">Component Systems</span>
+    </div>
+  </div>
+  <div class="hero-right">
+    <div class="hero-image-wrap">
+      <img src="https://www.figma.com/api/mcp/asset/2f459353-69f5-4694-84bd-38f312bda0bb" alt="The Haunting — Season 6 Live Event UI">
+    </div>
+  </div>
+  <div class="hero-scroll">Scroll</div>
+</section>
+
+<!-- ② OVERVIEW -->
+<section id="overview">
+  <div class="container">
+    <div class="eyebrow">01 &nbsp; Overview</div>
+    <div class="overview-grid">
+      <div class="role-card fade-up">
+        <div class="role-card-row">
+          <div class="role-label">Role</div>
+          <div class="role-value">Lead UX Designer</div>
+        </div>
+        <div class="role-card-row">
+          <div class="role-label">Team</div>
+          <div class="role-value">Product, Engineering,<br>Art, Narrative</div>
+        </div>
+        <div class="role-card-row">
+          <div class="role-label">Platform</div>
+          <div class="role-value">Console · PC</div>
+        </div>
+        <div class="role-card-row">
+          <div class="role-label">Timeline</div>
+          <div class="role-value">8 Weeks to Ship</div>
+        </div>
+        <div class="role-card-row">
+          <div class="role-label">Year</div>
+          <div class="role-value">2023</div>
+        </div>
+      </div>
+
+      <div class="overview-body fade-up">
+        <h2>A seasonal event built to drive depth — not just engagement</h2>
+        <p>The Haunting was a limited-time Halloween event integrated directly into the live Call of Duty HQ experience, serving <strong>tens of millions of active players</strong> across console and PC.</p>
+        <p>The event introduced two interconnected progression systems that players had to navigate in real-time between matches. Players earned a seasonal currency — Souls — during gameplay, then redeemed it for exclusive rewards in an event store. Simultaneously, they tracked and completed six <strong>map-based monster hunt challenges</strong>, unlocking a mastery weapon blueprint and unique collectibles as the ultimate reward.</p>
+        <p>I led the UX across the entire event hub: interaction design, visual system, information architecture, reward visibility, and progression flows — ensuring the experience felt <strong>immersive and thematically alive</strong> while remaining instantly legible to players who had seconds, not minutes, to parse it.</p>
+        <p>The season was recognized by the community as one of the strongest live-service events of the year — a direct signal that when UX and narrative reinforce each other, players notice.</p>
+      </div>
+
+      <div>
+        <div class="scope-label fade-up">Scope of Work</div>
+        <ul class="scope-list fade-up">
+          <li class="scope-item">Event Hub UX + IA</li>
+          <li class="scope-item">Reward Redemption Flows</li>
+          <li class="scope-item">Interactive Map System</li>
+          <li class="scope-item">Component System Design</li>
+          <li class="scope-item">Cross-functional Alignment</li>
+          <li class="scope-item">Prototype Delivery to Eng.</li>
+          <li class="scope-item">Visual Design Direction</li>
+          <li class="scope-item">Interaction State Systems</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ③ PROBLEM -->
+<section id="problem">
+  <div class="container">
+    <div class="eyebrow">02 &nbsp; Problem</div>
+    <h2 class="problem-headline fade-up">Two systems. One event window.<br><em>Zero room for confusion.</em></h2>
+    <div class="problem-grid">
+      <div class="problem-body fade-up">
+        <p>Call of Duty's live HQ interface is a <strong>high-velocity environment</strong>. Players spend 45–90 seconds in menus between matches. Any friction — an unclear reward state, a missed progression indicator, an ambiguous CTA — creates drop-off and disengagement from the event entirely.</p>
+        <p>The Haunting introduced two simultaneous systems that players had to understand <em>quickly</em>: a currency earn loop and a spatial objective system. The core UX problem wasn't making these look good — it was making them feel like <strong>one coherent experience</strong>, not two tasks to manage.</p>
+        <p>The hub had to serve three distinct player types simultaneously, each with different goals and attention spans: completionists tracking mastery progress, casual players browsing rewards, and high-frequency players who just wanted to know what they earned after a match.</p>
+        <div class="system-list">
+          <div class="system-item">
+            <div class="system-num">① </div>
+            <div>
+              <div class="system-name">SOULS SYSTEM</div>
+              <div class="system-desc">Match-earned currency redeemable in an event store for cosmetics, blueprints, and consumables. The earn loop needed to feel rewarding with every session.</div>
+            </div>
+          </div>
+          <div class="system-item">
+            <div class="system-num">② </div>
+            <div>
+              <div class="system-name">MONSTER HUNT</div>
+              <div class="system-desc">Six map-based challenge objectives, each tied to a specific monster encounter. Completion unlocked the mastery weapon blueprint — the event's prestige reward.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="fade-up">
+        <div class="diagram-box">
+          <div class="diagram-title">System Architecture</div>
+          <div class="diagram-nodes">
+            <div class="diag-node green">
+              <div class="diag-node-label">Match Activity</div>
+              <div class="diag-node-name">Souls Earned</div>
+            </div>
+            <div class="diag-arrow">↓ feeds into</div>
+            <div class="diag-node center">
+              <div class="diag-node-label">Primary Hub</div>
+              <div class="diag-node-name">Event HQ</div>
+            </div>
+            <div style="display:flex;gap:12px;width:100%;justify-content:center;">
+              <div style="display:flex;flex-direction:column;align-items:center;gap:8px;flex:1;max-width:140px;">
+                <div class="diag-arrow">↙ unlocks</div>
+                <div class="diag-node green" style="width:100%">
+                  <div class="diag-node-label">Store</div>
+                  <div class="diag-node-name" style="font-size:12px;">Reward Redemption</div>
+                </div>
+              </div>
+              <div style="display:flex;flex-direction:column;align-items:center;gap:8px;flex:1;max-width:140px;">
+                <div class="diag-arrow">↘ drives</div>
+                <div class="diag-node red" style="width:100%">
+                  <div class="diag-node-label">6 Objectives</div>
+                  <div class="diag-node-name" style="font-size:12px;">Monster Hunt</div>
+                </div>
+              </div>
+            </div>
+            <div class="diag-arrow">↓ both converge at</div>
+            <div class="diag-node" style="border-color:var(--accent-warm);background:rgba(200,168,122,0.06);width:100%;max-width:280px;">
+              <div class="diag-node-label">Prestige Reward</div>
+              <div class="diag-node-name">Mastery Blueprint</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ④ GOALS -->
+<section>
+  <div class="container">
+    <div class="eyebrow">03 &nbsp; Goals</div>
+    <div class="goals-grid fade-up">
+      <div class="goal-card">
+        <span class="goal-icon">◈</span>
+        <div class="goal-label">Player Goal</div>
+        <div class="goal-text">Make progression feel immediately legible — no tutorial required.</div>
+      </div>
+      <div class="goal-card">
+        <span class="goal-icon">◈</span>
+        <div class="goal-label">Business Goal</div>
+        <div class="goal-text">Drive sustained daily engagement throughout the full event window.</div>
+      </div>
+      <div class="goal-card">
+        <span class="goal-icon">◈</span>
+        <div class="goal-label">Design Goal</div>
+        <div class="goal-text">Build a reusable event UI system that scales to future seasonal releases.</div>
+      </div>
+    </div>
+    <div class="fade-up">
+      <div class="metrics-title">How Success Would Be Measured</div>
+      <ul class="metrics-list">
+        <li class="metric-item">Player returns for Day 2+ of event — a direct retention signal beyond Day 1 novelty</li>
+        <li class="metric-item">Reward redemption rate — measures whether players understand the earn loop well enough to act on it</li>
+        <li class="metric-item">Monster Hunt completion across all 6 objectives — measures depth of engagement with the challenge system</li>
+        <li class="metric-item">Zero support escalations tied to "how do I earn Souls" — the clearest signal of UX legibility at scale</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ⑤ CONSTRAINTS -->
+<section>
+  <div class="container">
+    <div class="eyebrow">04 &nbsp; Constraints</div>
+    <div class="constraints-grid fade-up">
+      <div class="constraint-card">
+        <div class="constraint-label">Technical</div>
+        <div class="constraint-text">Designed within the existing HQ navigation and component architecture. No new primitives — only extensions of the established design system.</div>
+      </div>
+      <div class="constraint-card">
+        <div class="constraint-label">Timeline</div>
+        <div class="constraint-text">8 weeks from brief to ship. No extension buffer. The event had a hard calendar anchor — a missed launch date was not an option.</div>
+      </div>
+      <div class="constraint-card">
+        <div class="constraint-label">Platform</div>
+        <div class="constraint-text">Must work equally on console (gamepad-first UX) and PC. Every interaction had to be accessible via D-pad, thumbstick, and keyboard+mouse.</div>
+      </div>
+      <div class="constraint-card">
+        <div class="constraint-label">Scope</div>
+        <div class="constraint-text">Required simultaneous alignment with Art, Narrative, Engineering, and Product — with a single UX voice representing the player experience across all teams.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ⑥ RESEARCH -->
+<section id="process">
+  <div class="container">
+    <div class="eyebrow">05 &nbsp; Research + Insights</div>
+    <div class="research-intro fade-up">
+      <h2>Understanding how users navigate under time pressure</h2>
+      <p>Players in live-service ecosystems are not browsing — they're scanning. They operate in 45-second decision windows between matches. Every insight below was derived from behavioral observation and existing engagement data from prior seasonal events.</p>
+    </div>
+    <div class="insights-grid fade-up">
+      <div class="insight-card">
+        <div class="insight-num">INSIGHT 01</div>
+        <div class="insight-topic">Scanning Behavior</div>
+        <div class="insight-text">Users in high-frequency apps develop recognition patterns — not reading patterns.</div>
+        <div class="insight-implication">
+          <strong>Design Implication</strong>
+          State changes must be visible peripherally. Progress updates can't live buried inside submenus.
+        </div>
+      </div>
+      <div class="insight-card">
+        <div class="insight-num">INSIGHT 02</div>
+        <div class="insight-topic">Dual Progression Fatigue</div>
+        <div class="insight-text">When two progress bars coexist, users anchor to the one they're closest to completing.</div>
+        <div class="insight-implication">
+          <strong>Design Implication</strong>
+          Visual hierarchy must reinforce which system is primary at any given moment — not leave users to decide.
+        </div>
+      </div>
+      <div class="insight-card">
+        <div class="insight-num">INSIGHT 03</div>
+        <div class="insight-topic">Reward Legibility</div>
+        <div class="insight-text">Users abandon reward systems they can't mentally model in under 10 seconds.</div>
+        <div class="insight-implication">
+          <strong>Design Implication</strong>
+          Every reward must surface its earn mechanism before its cost. Show the path before showing the price.
+        </div>
+      </div>
+      <div class="insight-card">
+        <div class="insight-num">INSIGHT 04</div>
+        <div class="insight-topic">Discovery Behavior</div>
+        <div class="insight-text">Players explore seasonal content in 3-second decision bursts between queue loading.</div>
+        <div class="insight-implication">
+          <strong>Design Implication</strong>
+          Every CTA must work in isolation without surrounding context. Don't design for ideal reading order.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ⑦ STRATEGY -->
+<section>
+  <div class="container">
+    <div class="eyebrow">06 &nbsp; Design Strategy</div>
+    <div class="strategy-layout fade-up">
+      <div class="strategy-body">
+        <h2 class="strategy-headline">One hub. Two systems.<br>A single mental model.</h2>
+        <p>Rather than treating the Souls currency system and the Monster Hunt as two separate features, I designed them as <strong>one cohesive event narrative</strong>. Match activity earned Souls. Souls revealed reward targets. Reward targets motivated deeper play — which drove Monster Hunt completion. Every loop reinforced the next.</p>
+        <p>The UX strategy: design the hub so that both systems felt like progress toward <strong>one exciting outcome</strong> — the mastery weapon blueprint — rather than two parallel tasks competing for the player's attention.</p>
+        <p>This meant the event hub had to answer three questions at a glance: <strong>What did I earn?</strong> What can I unlock? What's left to do? In that order, every time.</p>
+      </div>
+      <div class="strategy-diagram fade-up">
+        <div style="font-family:var(--font-mono);font-size:10px;letter-spacing:0.15em;color:var(--text-muted);margin-bottom:28px;text-transform:uppercase;">System Flow</div>
+        <div class="strat-row">
+          <div class="strat-box">Match Activity</div>
+          <div class="strat-arrow">→</div>
+          <div class="strat-box highlight-green">Souls Earned</div>
+        </div>
+        <div class="strat-connector"></div>
+        <div class="strat-row">
+          <div class="strat-box highlight-green">Store Opens</div>
+        </div>
+        <div style="margin:12px 0 4px;font-family:var(--font-mono);font-size:10px;color:var(--text-muted);padding-left:8px;">↕ parallel track</div>
+        <div class="strat-row">
+          <div class="strat-box">Match Activity</div>
+          <div class="strat-arrow">→</div>
+          <div class="strat-box highlight-red">Hunt Progress</div>
+        </div>
+        <div class="strat-connector"></div>
+        <div style="margin-top:8px;padding:16px;border:1px solid var(--accent-warm);border-radius:2px;background:rgba(200,168,122,0.06);">
+          <div style="font-family:var(--font-mono);font-size:10px;color:var(--accent-warm);letter-spacing:0.1em;margin-bottom:6px;text-transform:uppercase;">Both converge at</div>
+          <div style="font-family:var(--font-display);font-size:14px;font-weight:700;color:var(--text-primary);">Mastery Blueprint</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ⑧ FLOWS -->
+<section>
+  <div class="container">
+    <div class="eyebrow">07 &nbsp; User Flows</div>
+    <div class="flows-intro fade-up">
+      <h2>Mapping the critical paths</h2>
+      <p>Two primary flows drive the entire event experience. Both begin from the same entry point — the event hub — and diverge based on player intent.</p>
+    </div>
+
+    <div class="flow-block fade-up">
+      <div class="flow-header">
+        <div class="flow-dot green"></div>
+        <div class="flow-name">Flow 01 — Souls Redemption Path</div>
+      </div>
+      <div class="flow-steps">
+        <div class="flow-step">
+          <div class="step-box">Enter HQ</div>
+          <div class="step-arrow"></div>
+        </div>
+        <div class="flow-step">
+          <div class="step-box key">Event Tab Highlighted</div>
+          <div class="step-arrow"></div>
+        </div>
+        <div class="flow-step">
+          <div class="step-box">Enter Event Hub</div>
+          <div class="step-arrow"></div>
+        </div>
+        <div class="flow-step">
+          <div class="step-box key">View Souls Counter</div>
+          <div class="step-arrow"></div>
+        </div>
+        <div class="flow-step">
+          <div class="step-box">Browse Rewards</div>
+          <div class="step-arrow"></div>
+        </div>
+        <div class="flow-step">
+          <div class="step-box">Select Item</div>
+          <div class="step-arrow"></div>
+        </div>
+        <div class="flow-step">
+          <div class="step-box key">Confirm Cost</div>
+          <div class="step-arrow"></div>
+        </div>
+        <div class="flow-step">
+          <div class="step-box">Item to Locker ✓</div>
+        </div>
+      </div>
+      <div class="flow-rationale"><strong>UX decision:</strong> The event tab is surfaced as a persistent highlight in the HQ nav — ensuring discoverability without requiring players to search. The Souls counter appears before the reward grid so players know their spending power before they browse.</div>
+    </div>
+
+    <div class="flow-block fade-up">
+      <div class="flow-header">
+        <div class="flow-dot red"></div>
+        <div class="flow-name">Flow 02 — Monster Hunt Path</div>
+      </div>
+      <div class="flow-steps">
+        <div class="flow-step">
+          <div class="step-box">Enter Event Hub</div>
+          <div class="step-arrow"></div>
+        </div>
+        <div class="flow-step">
+          <div class="step-box key-red">View Map Widget</div>
+          <div class="step-arrow"></div>
+        </div>
+        <div class="flow-step">
+          <div class="step-box">Select Active Monster</div>
+          <div class="step-arrow"></div>
+        </div>
+        <div class="flow-step">
+          <div class="step-box key-red">See Location + Challenge</div>
+          <div class="step-arrow"></div>
+        </div>
+        <div class="flow-step">
+          <div class="step-box">Return to Match</div>
+          <div class="step-arrow"></div>
+        </div>
+        <div class="flow-step">
+          <div class="step-box">Complete Objective</div>
+          <div class="step-arrow"></div>
+        </div>
+        <div class="flow-step">
+          <div class="step-box key-red">Progress Updated</div>
+          <div class="step-arrow"></div>
+        </div>
+        <div class="flow-step">
+          <div class="step-box">Blueprint Revealed ✓</div>
+        </div>
+      </div>
+      <div class="flow-rationale"><strong>UX decision:</strong> The Monster Hunt widget surfaces six monster thumbnails as a spatial map — one thumbnail per objective, creating a direct one-to-one mental model. Players understand scope (6 challenges) before understanding mechanics. Progress persists visually so returning players re-orient instantly.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ⑨ INTERACTION DESIGN -->
+<section id="design">
+  <div class="container">
+    <div class="eyebrow">08 &nbsp; Interaction Design</div>
+    <div style="max-width:600px;margin-bottom:20px;" class="fade-up">
+      <h2 style="font-size:40px;font-weight:700;letter-spacing:-0.02em;line-height:1.15;margin-bottom:16px;">Three zones. Every decision annotated.</h2>
+      <p style="color:var(--text-secondary);font-size:15px;line-height:1.8;">Each component in the event hub was designed with explicit state logic, annotated for engineering, and validated against the core insight that players operate in 3-second decision windows.</p>
+    </div>
+    <div class="interaction-panels fade-up">
+      <div class="i-panel">
+        <div class="i-panel-label">Component 01</div>
+        <div class="i-panel-name">Souls Counter Widget</div>
+        <ul class="annotation-list">
+          <li class="annotation-item">Updates in real-time post-match — reinforces the reward loop without requiring navigation</li>
+          <li class="annotation-item">"152 SOULS CAPTURED" uses player's specific count — ownership language, not abstract currency</li>
+          <li class="annotation-item">CTA arrows below the counter hint at next action without instructing — guided but not patronizing</li>
+          <li class="annotation-item">Green color token ties directly to the earn state — players learn green = progress, not taught</li>
+        </ul>
+      </div>
+      <div class="i-panel">
+        <div class="i-panel-label">Component 02</div>
+        <div class="i-panel-name">Reward Grid System</div>
+        <ul class="annotation-list">
+          <li class="annotation-item">Cost shown as trophy count, not abstract number — players understand relative effort at a glance</li>
+          <li class="annotation-item">Green text = affordable. Neutral = not yet earned. Locked state preserved player dignity — no red X</li>
+          <li class="annotation-item">Card grid mirrors the Battle Pass mental model — zero new UX pattern to learn, leveraging existing habit</li>
+          <li class="annotation-item">Mastery side card peeks from the right — always visible, never requiring a sub-navigation to discover</li>
+        </ul>
+      </div>
+      <div class="i-panel">
+        <div class="i-panel-label">Component 03</div>
+        <div class="i-panel-name">Monster Hunt Map Widget</div>
+        <ul class="annotation-list">
+          <li class="annotation-item">6 monster thumbnails = 6 objectives. One-to-one spatial mapping removes scope ambiguity completely</li>
+          <li class="annotation-item">Locked state uses grayed visual outline, not disabled text — visual language, not verbal instruction</li>
+          <li class="annotation-item">"VIEW CLASSIFIED INTEL" CTA uses narrative language — clicking feels like gameplay, not admin</li>
+          <li class="annotation-item">Widget width constrained to sidebar — doesn't compete with reward grid as the primary attention zone</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ⑩ KEY SCREENS -->
+<section>
+  <div class="container">
+    <div class="eyebrow">09 &nbsp; Key Screens</div>
+    <div class="screens-intro fade-up">
+      <h2>The shipped product, in context</h2>
+      <p>Every screen shown here is the production-shipped UI. Annotations surface the design decisions behind what you're looking at — not descriptions of what's visible.</p>
+    </div>
+
+    <div class="screen-showcase fade-up">
+      <div class="screen-chrome">
+        <div class="chrome-dot r"></div>
+        <div class="chrome-dot y"></div>
+        <div class="chrome-dot g"></div>
+        <div class="chrome-label">Event Hub — Default State / Reward View</div>
+      </div>
+      <img src="https://www.figma.com/api/mcp/asset/8cf1724c-80e1-496e-a17e-b13fae2a64e5" alt="Event Hub — Default State" class="screen-image" onerror="this.src='https://www.figma.com/api/mcp/asset/2f459353-69f5-4694-84bd-38f312bda0bb'">
+      <div class="screen-annotation-strip">
+        <div class="annotation">
+          <div class="annotation-label">Navigation Architecture</div>
+          <div class="annotation-text">The Haunting tab is highlighted in the primary HQ nav — persistent and always accessible. Players land here from any entry point, not just through dedicated flows.</div>
+        </div>
+        <div class="annotation">
+          <div class="annotation-label">Three-Zone Hierarchy</div>
+          <div class="annotation-text">Left sidebar: Monster Hunt widget. Center viewport: Reward grid. Top center: Souls counter. Three distinct zones with zero overlap — each serving a different player intent.</div>
+        </div>
+        <div class="annotation">
+          <div class="annotation-label">Reward Card States</div>
+          <div class="annotation-text">Cards surface item type, cost, and rarity simultaneously. The mastery side card peeks from the right — always visible, never requiring additional navigation to discover its existence.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="screen-showcase fade-up">
+      <div class="screen-chrome">
+        <div class="chrome-dot r"></div>
+        <div class="chrome-dot y"></div>
+        <div class="chrome-dot g"></div>
+        <div class="chrome-label">Monster Hunt Map Screen — Challenge Selection</div>
+      </div>
+      <img src="https://www.figma.com/api/mcp/asset/8a0fb66c-3af3-4dc7-8e5c-d45f4637c915" alt="Monster Hunt Map Screen" class="screen-image" onerror="this.src='https://www.figma.com/api/mcp/asset/2f459353-69f5-4694-84bd-38f312bda0bb'">
+      <div class="screen-annotation-strip">
+        <div class="annotation">
+          <div class="annotation-label">Spatial Challenge Model</div>
+          <div class="annotation-text">The map-based layout gives players a geographic mental model of objectives. Monsters are located, not listed — tying the UI directly to the in-game world.</div>
+        </div>
+        <div class="annotation">
+          <div class="annotation-label">Progressive Disclosure</div>
+          <div class="annotation-text">Challenge details surface only on selection. The overview shows completion state — not mechanics — so players can assess progress in a single glance before clicking deeper.</div>
+        </div>
+        <div class="annotation">
+          <div class="annotation-label">Mastery as Destination</div>
+          <div class="annotation-text">The mastery blueprint is always visible as the endpoint — a constant motivational anchor that reframes every individual challenge as one step toward the ultimate reward.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="screen-showcase fade-up">
+      <div class="screen-chrome">
+        <div class="chrome-dot r"></div>
+        <div class="chrome-dot y"></div>
+        <div class="chrome-dot g"></div>
+        <div class="chrome-label">Mastery Blueprint Hover State — Reward Reveal</div>
+      </div>
+      <img src="https://www.figma.com/api/mcp/asset/03fac26a-0219-496e-9e83-797afbc19300" alt="Mastery Blueprint Hover State" class="screen-image" onerror="this.src='https://www.figma.com/api/mcp/asset/2f459353-69f5-4694-84bd-38f312bda0bb'">
+      <div class="screen-annotation-strip">
+        <div class="annotation">
+          <div class="annotation-label">Reward Reveal Moment</div>
+          <div class="annotation-text">The mastery weapon blueprint reveal is treated as a climactic UI moment — full panel focus, weapon showcase, and completion ceremony. Earned moments deserve earned presentation.</div>
+        </div>
+        <div class="annotation">
+          <div class="annotation-label">Locked State Dignity</div>
+          <div class="annotation-text">Locked items use visual obscuring rather than disabled text. Players understand "not yet" without being told "no" — preserving motivation instead of creating friction.</div>
+        </div>
+        <div class="annotation">
+          <div class="annotation-label">Progress Persistence</div>
+          <div class="annotation-text">Mastery progress pips are always visible in the panel. Players know exactly how many items they've unlocked toward the mastery reward without navigating to a separate screen.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ⑪ UI SYSTEM -->
+<section>
+  <div class="container">
+    <div class="eyebrow">10 &nbsp; UI System</div>
+    <div style="max-width:600px;margin-bottom:48px;" class="fade-up">
+      <h2 style="font-size:40px;font-weight:700;letter-spacing:-0.02em;line-height:1.15;margin-bottom:16px;">A component system built for speed and theme</h2>
+      <p style="color:var(--text-secondary);font-size:15px;line-height:1.8;">Every component was designed with reusability as the primary constraint. The event theme was applied via color variables and texture overlays — the structural components remain untouched and available for future seasons.</p>
+    </div>
+
+    <div class="system-grid fade-up">
+      <div class="system-card">
+        <div class="sys-component-name">Reward Card — Small</div>
+        <div class="sys-component-desc">3 defined states: default, selected (gold outline), locked (reduced opacity). Item type + cost always visible simultaneously.</div>
+        <span class="sys-tag">3 States</span>
+      </div>
+      <div class="system-card">
+        <div class="sys-component-name">Souls Counter Widget</div>
+        <div class="sys-component-desc">Live-updating earn display. Counter text, CTA arrows, and background gradient are all tokenized for seasonal theming.</div>
+        <span class="sys-tag">Live Data</span>
+      </div>
+      <div class="system-card">
+        <div class="sys-component-name">Monster Hunt Widget</div>
+        <div class="sys-component-desc">6-slot spatial map component. Each slot = one objective. Completed, active, and locked states defined. Header is themeable.</div>
+        <span class="sys-tag">Configurable</span>
+      </div>
+      <div class="system-card">
+        <div class="sys-component-name">Navigation Pill — Active</div>
+        <div class="sys-component-desc">Event-specific nav state with accent color override. Inherits HQ nav structure — no new navigation primitive introduced.</div>
+        <span class="sys-tag">Extension</span>
+      </div>
+      <div class="system-card">
+        <div class="sys-component-name">CTA Button — Primary</div>
+        <div class="sys-component-desc">Narrative-language button system. Text, icon, and color all overridable. Sheen animation built in for event context.</div>
+        <span class="sys-tag">Animated</span>
+      </div>
+      <div class="system-card">
+        <div class="sys-component-name">Progress Pip System</div>
+        <div class="sys-component-desc">Mastery progress tracker. Each pip = one item unlocked. Filled, empty, and partially filled states. Row length is configurable.</div>
+        <span class="sys-tag">Scalable</span>
+      </div>
+      <div class="system-card">
+        <div class="sys-component-name">Mastery Side Card</div>
+        <div class="sys-component-desc">Persistent preview panel for the mastery reward. Always visible in the reward grid view — drives aspiration without demanding focus.</div>
+        <span class="sys-tag">Persistent</span>
+      </div>
+      <div class="system-card">
+        <div class="sys-component-name">Event Hub Header</div>
+        <div class="sys-component-desc">Full-bleed background image system with gradient overlay. Title, subtitle, and soul counter docked to defined layout zones.</div>
+        <span class="sys-tag">Themeable</span>
+      </div>
+      <div class="system-card">
+        <div class="sys-component-name">Bundle Carousel</div>
+        <div class="sys-component-desc">Horizontally scrollable card carousel for premium bundles. Pagination pips, shadow depth, and CTA hints all included.</div>
+        <span class="sys-tag">Interactive</span>
+      </div>
+    </div>
+
+    <div class="system-principles fade-up">
+      <div class="principles-label">System Principles</div>
+      <ul class="principles-list">
+        <li class="principle-item">All interactive states defined upfront: default, hover, selected, locked, and disabled — zero ambiguity for engineering</li>
+        <li class="principle-item">Components use existing HQ design tokens only — no new color primitives or type styles introduced</li>
+        <li class="principle-item">Event theme applied via color variables and texture overlays exclusively — structure untouched, future seasons reuse freely</li>
+        <li class="principle-item">Every component annotated with state logic and Figma-to-engineering handoff specs before engineering started</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ⑬ IMPACT -->
+<section id="impact">
+  <div class="container">
+    <div class="eyebrow">11 &nbsp; Impact</div>
+    <div class="impact-stats fade-up">
+      <div class="stat-card">
+        <div class="stat-number">10M+</div>
+        <div class="stat-desc">Active players reached at event launch across console and PC</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">8 wks</div>
+        <div class="stat-desc">From brief to shipped — no extension, no scope reduction</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">Zero</div>
+        <div class="stat-desc">UX-related bugs escalated post-launch. Components scaled as designed.</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">S6</div>
+        <div class="stat-desc">Widely cited by community as one of the strongest seasonal events in recent CoD history</div>
+      </div>
+    </div>
+    <div class="impact-quote fade-up">
+      <p>The season shipped on schedule with no UX-related issues escalated post-launch. The event hub system I designed became a <strong>reference point for subsequent seasonal event UX work</strong> — proof that component-first design under constraint doesn't sacrifice quality. It guarantees it.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ⑭ COLLABORATION -->
+<section>
+  <div class="container">
+    <div class="eyebrow">12 &nbsp; Collaboration</div>
+    <div class="collab-intro fade-up">
+      <h2>Cross-functional from brief to ship</h2>
+      <p>Embedded as the sole UX voice in a cross-discipline sprint team — building alignment through annotated prototypes and component specs rather than documentation.</p>
+    </div>
+    <div class="timeline-track fade-up">
+      <div class="timeline-spine"></div>
+      <div class="timeline-cols">
+        <div class="timeline-col">
+          <div class="timeline-dot"></div>
+          <div class="timeline-week">Weeks 1–2</div>
+          <div class="timeline-team">Product</div>
+          <div class="timeline-desc">Defined event scope, player flows, and hub information hierarchy with PM team. Established dual-system narrative strategy and player journey mapping.</div>
+        </div>
+        <div class="timeline-col">
+          <div class="timeline-dot"></div>
+          <div class="timeline-week">Weeks 3–4</div>
+          <div class="timeline-team">Engineering</div>
+          <div class="timeline-desc">Reviewed feasibility of hub components and interaction state logic. Delivered annotated specs. Engineering parallelize-built while I iterated — no sequential handoff.</div>
+        </div>
+        <div class="timeline-col">
+          <div class="timeline-dot"></div>
+          <div class="timeline-week">Weeks 5–6</div>
+          <div class="timeline-team">Art + Narrative</div>
+          <div class="timeline-desc">Aligned UI theme with seasonal visual direction and narrative voice. Ensured the UX language ("Souls Captured," "Classified Intel") matched narrative intent without sacrificing clarity.</div>
+        </div>
+        <div class="timeline-col">
+          <div class="timeline-dot"></div>
+          <div class="timeline-week">Weeks 7–8</div>
+          <div class="timeline-team">QA + Launch</div>
+          <div class="timeline-desc">Final handoff with component documentation and annotation. State logic validation across console and PC. Real-time iteration on edge cases surfaced during QA pass.</div>
+        </div>
+      </div>
+    </div>
+    <div class="collab-note fade-up">
+      Operated as the only UX voice in a team of engineers, artists, and narrative designers. Built alignment through annotated prototypes and component-level specifications rather than lengthy documentation — enabling parallel workstreams and eliminating the traditional design-then-hand-off bottleneck.
+    </div>
+  </div>
+</section>
+
+<!-- ⑮ REFLECTION -->
+<section id="reflection">
+  <div class="container">
+    <div class="eyebrow">13 &nbsp; Reflection</div>
+    <div style="max-width:600px;margin-bottom:64px;" class="fade-up">
+      <h2 style="font-size:40px;font-weight:700;letter-spacing:-0.02em;line-height:1.15;margin-bottom:16px;">What I carry forward from this project</h2>
+      <p style="color:var(--text-secondary);font-size:15px;line-height:1.8;">Three lenses I use to evaluate any live-service or SaaS product design problem since shipping The Haunting.</p>
+    </div>
+    <div class="reflection-grid fade-up">
+      <div class="ref-col">
+        <div class="ref-label">What Worked</div>
+        <div class="ref-item">
+          <strong>The narrative arc strategy</strong>
+          Treating both systems as one event story gave the hub a through-line that players followed intuitively — without a tutorial or explanation.
+        </div>
+        <div class="ref-item">
+          <strong>Component-first delivery</strong>
+          Engineering could build in parallel because specs were complete before screens were final. Faster ship, fewer revision cycles.
+        </div>
+        <div class="ref-item">
+          <strong>Progressive disclosure on mastery</strong>
+          Keeping the blueprint visible but partially obscured created sustained aspiration — players returned not because they were told to, but because they wanted to.
+        </div>
+      </div>
+      <div class="ref-col">
+        <div class="ref-label">What I'd Change</div>
+        <div class="ref-item">
+          <strong>Earlier map alignment</strong>
+          We iterated more than necessary on Monster Hunt pin placement and locked state logic. Spatial systems need dedicated alignment sessions, not inline review.
+        </div>
+        <div class="ref-item">
+          <strong>Prototype the earn moment</strong>
+          The static Souls counter misses the satisfaction of the earn animation. Given more time, I'd have prototyped the post-match currency update in motion — even a simple one.
+        </div>
+        <div class="ref-item">
+          <strong>Player type segmentation</strong>
+          The hub served all three player types but wasn't explicitly designed to. Explicit persona-to-zone mapping from week one would have accelerated alignment with PM.
+        </div>
+      </div>
+      <div class="ref-col">
+        <div class="ref-label">What I Carry Forward</div>
+        <div class="ref-item">
+          <strong>Information hierarchy is the job</strong>
+          Not the art direction. Not the motion. The question "what does a user need to know first?" should precede every design decision.
+        </div>
+        <div class="ref-item">
+          <strong>Seasonal UX is retention design</strong>
+          Every interaction in a live-service event is a reason to return — or a reason not to. The design shapes behavior far more than the reward itself.
+        </div>
+        <div class="ref-item">
+          <strong>Constraints accelerate clarity</strong>
+          The tightest constraints — 8 weeks, existing components only, no new nav — produced the clearest design. Constraints are a design tool, not a limitation.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-left">
+    The Haunting — Season 6 Live Event<br>
+    Infinity Ward / Activision · 2023<br>
+    UX Case Study
+  </div>
+  <div class="footer-right">
+    Lead UX Designer<br>
+    Interaction Design · UI Systems · Live Service<br>
+    Rayz Vault Portfolio
+  </div>
+</footer>
+
+<script>
+  // Scroll nav
+  const nav = document.getElementById('nav');
+  window.addEventListener('scroll', () => {
+    nav.classList.toggle('scrolled', window.scrollY > 60);
+  });
+
+  // Fade up on scroll
+  const fadeEls = document.querySelectorAll('.fade-up');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.08, rootMargin: '0px 0px -60px 0px' });
+  fadeEls.forEach(el => observer.observe(el));
+
+  // Stagger children
+  document.querySelectorAll('.insights-grid, .goals-grid, .constraints-grid, .impact-stats').forEach(grid => {
+    grid.querySelectorAll('.insight-card, .goal-card, .constraint-card, .stat-card').forEach((card, i) => {
+      card.style.transitionDelay = `${i * 0.08}s`;
+    });
+  });
+</script>
+</body>
+</html>
